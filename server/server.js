@@ -51,6 +51,8 @@ app.get('/todos/:id', (request, response) => {
         response.send(todo)
     }, (error) => {
         return response.status(404).send()
+    }).catch((e) => {
+        response.status(400).send()
     })
 })
 
@@ -65,7 +67,9 @@ app.put('/todos/:id', (request,result) => {
     },{
         upsert: true
     }, (e) => {
-        result.status(400).send(e)
+        result.status(404).send(e)
+    }).catch((e) => {
+        result.status(400).send()
     })    
 })
 
@@ -74,11 +78,13 @@ app.delete('/todos/:id', (request, result) => {
     let id = request.params.id
 
     validateID(id)
-    
+
     Todo.findOneAndRemove((id) => {
         result.send(id)
     }, (e) => {
         result.status(404).send(e)
+    }).catch((e) => {
+        result.status(400).send()
     })
 })
 
