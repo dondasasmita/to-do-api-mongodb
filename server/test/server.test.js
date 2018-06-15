@@ -11,12 +11,12 @@ const request = require('supertest')
 const {app} = require('./../server.js')
 const {Todo} = require('./../models/todo')
 
-beforeEach((done) => {
-    Todo.remove({}).then(() => done())
-    // .catch((e) => {
-    //     done(e)
-    // })
-})
+// beforeEach((done) => {
+//     Todo.remove({}).then(() => done())
+//     // .catch((e) => {
+//     //     done(e)
+//     // })
+// })
 
 describe('Server Test', () => {
     //Post Test

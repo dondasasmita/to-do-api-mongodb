@@ -10,6 +10,8 @@ const {User} = require('./models/user')
 
 //create app 
 const app = express()
+//setup port for deployment
+const port = process.env.PORT || 3000
 
 app.use(bodyParser.json())
 
@@ -103,8 +105,8 @@ app.get('/users/:id', (req, res) => {
 })
 
 
-app.listen(3000, () => {
-    console.log('Started on port 3000')
+app.listen(port, () => {
+    console.log(`Started on port ${port}`)
 })
 
 exports.module = {
