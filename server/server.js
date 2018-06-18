@@ -81,10 +81,11 @@ app.delete('/todos/:id', (request, result) => {
 
     validateID(id)
 
-    Todo.findOneAndRemove((id) => {
-        result.send(id)
-    }, (e) => {
-        result.status(404).send(e)
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if (!todo) {
+            return result.status(404).send()
+        }
+        result.status(200).send(todo)
     }).catch((e) => {
         result.status(400).send()
     })
