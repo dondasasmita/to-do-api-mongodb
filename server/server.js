@@ -1,6 +1,7 @@
 //import libraries
 const express = require('express')
 const bodyParser = require('body-parser')
+const _ = require('lodash')
 
 //local imports
 const {ObjectID} = require('mongodb')
@@ -59,20 +60,30 @@ app.get('/todos/:id', (request, response) => {
 })
 
 //UPDATE todos by id
-app.put('/todos/:id', (request,result) => {
+app.patch('/todos/:id', (request,result) => {
     let id = request.params.id
+    //grabbed the request body and only allwoing the text and completed props to be update by user
+    let body = _.pick(request.body, ['text', 'completed'])
 
     validateID(id)
 
-    Todo.findOneAndUpdate((id),{
-        text: request.body.text
-    },{
-        upsert: true
-    }, (e) => {
-        result.status(404).send(e)
+    //get timestamp when completed is changed to true
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime()
+    } else {
+        body.completed = false
+        body.completedAt = null
+    }
+
+    Todo.findByIdAndUpdate(id, {$set:body}, {new: true}).then((todo) => {
+        if(!todo){
+            result.status(404).send()
+        }
+        result.status(200).send({todo})
     }).catch((e) => {
         result.status(400).send()
-    })    
+    })
+
 })
 
 // DELETE todo by id
