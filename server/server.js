@@ -23,6 +23,12 @@ const validateID = (id) => {
     } 
 }
 
+/*
+-----------------
+TODOS ROUTES
+-----------------
+*/
+
 //Create a todo
 app.post('/todos', (request, result) => {
     let todo = new Todo ({
@@ -102,6 +108,12 @@ app.delete('/todos/:id', (request, result) => {
     })
 })
 
+/*
+-----------------
+USER ROUTES
+-----------------
+*/
+
 //GET user by id
 app.get('/users/:id', (req, res) => {
     let id = req.params.id
@@ -110,9 +122,47 @@ app.get('/users/:id', (req, res) => {
     validateID(id)
 
     User.findById(id).then((user) => {
-        res.send(user)
+        res.status(200).send(user)
     }, (err) => {
         res.status(404).send()
+    })
+})
+
+//POST request to create a user
+app.post('/users', (req, res) => {
+    let body = _.pick(req.body, ['username', 'email', 'password'])
+    let user = new User (body)
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+        }).then((token) => {
+            res.header('x-auth', token).send(user);
+        }).catch((e) => {
+            res.status(400).send(e);
+        })
+
+    //Below code does not return the header with the token (x-auth - undefined)    
+    // user.save().then(() => {
+    //     user.generateAuthToken() 
+    // }).then((token) => {
+    //     res.header('x-auth',token).send(user)
+    // }).catch((e) => {
+    //     res.status(400).send()
+    // })
+})
+
+//DELETE request 
+app.delete('/users/:id', (req, res) => {
+    let id = req.params.id
+    validateID(id)
+
+    User.findByIdAndRemove(id).then((user) => {
+        if (!user) {
+            return res.status(404).send()
+        }
+        res.status(202).send()
+    }).catch((e) => {
+        res.status(400).send(e)
     })
 })
 
